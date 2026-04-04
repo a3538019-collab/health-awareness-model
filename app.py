@@ -1,31 +1,41 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 
-st.title("Health Awareness Video Spread Model")
+st.title("Health Awareness Video Viral Spread Model")
 
-st.write("This model shows how a health awareness video spreads among students")
+st.write("Simulating real-life sharing of a video among students")
 
 # Inputs
-initial_viewers = st.slider("Initial Viewers", 10, 1000, 100)
-share_rate = st.slider("Share Rate (0-1)", 0.0, 1.0, 0.3)
-decay = st.slider("Decay Rate (0-1)", 0.0, 1.0, 0.1)
-days = st.slider("Days", 1, 30, 10)
+initial_viewers = st.slider("Initial Viewers", 10, 500, 50)
+share_rate = st.slider("Share Probability (0-1)", 0.0, 1.0, 0.4)
+connections = st.slider("Avg Friends per Student", 1, 10, 3)
+decay = st.slider("Interest Decay (0-1)", 0.0, 1.0, 0.1)
+days = st.slider("Days", 1, 20, 10)
 
 # Simulation
-reach = [initial_viewers]
+viewers = [initial_viewers]
 
 for i in range(days):
-    new_reach = reach[-1] + (share_rate * reach[-1]) - (decay * reach[-1])
-    reach.append(new_reach)
+    current = viewers[-1]
+    
+    # Network spread
+    new_viewers = current * share_rate * connections
+    
+    # Decay (people losing interest)
+    lost = current * decay
+    
+    next_viewers = current + new_viewers - lost
+    viewers.append(next_viewers)
 
 # Output
 st.subheader("Total Reach")
-st.write(f"{int(reach[-1])} viewers")
+st.write(f"{int(viewers[-1])} people reached")
 
 # Graph
-st.subheader("Spread Over Time")
+st.subheader("Viral Spread Over Time")
 fig, ax = plt.subplots()
-ax.plot(reach)
+ax.plot(viewers)
 ax.set_xlabel("Days")
-ax.set_ylabel("Viewers")
+ax.set_ylabel("People Reached")
 st.pyplot(fig)
+
